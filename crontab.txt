@@ -1,0 +1,13 @@
+open terminal
+sudo crontab -e 
+select 1
+at the end add @reboot python /home/arka/Documents/IR_Temp/real_time_motion_temp_camera_web_app.py &
+then control plus s and control plus x
+
+to stop crontab
+
+open terminal
+sudo crontab -e 
+select 1
+add # before the process
+then control plus s and control plus x

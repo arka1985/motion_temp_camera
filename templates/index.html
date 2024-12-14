@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperature and Motion Dashboard</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* General Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #2e8b57;
+        }
+
+        h2 {
+            color: #4682b4;
+        }
+
+        /* Data Boxes */
+        .data-box {
+            background-color: #ffffff;
+            border: 2px solid #4682b4;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-size: 1.2em;
+        }
+
+        .data-box span {
+            font-weight: bold;
+        }
+
+        /* Camera Feed Styling */
+        #camera-feed {
+            max-width: 80%;
+            max-height: 320px;
+            border: 3px solid #4682b4;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+
+        /* Developer Info Section */
+        .developer-info {
+            margin-top: 30px;
+            font-size: 1.2em;
+            color: #2e8b57;
+        }
+
+        .developer-info span {
+            font-weight: bold;
+        }
+
+        /* Dynamic Styling */
+        .motion-detected {
+            color: green;
+        }
+
+        .no-motion {
+            color: red;
+        }
+
+        .temp-low {
+            color: orange;
+        }
+
+        .temp-normal {
+            color: green;
+        }
+
+        .temp-high {
+            color: red;
+        }
+    </style>
+    <script>
+        function fetchData() {
+            $.get('/data', function(data) {
+                // Update the motion status text and color
+                const motionStatus = $('#motion-status');
+                if (data.motion_detected) {
+                    motionStatus.text("Motion Detected");
+                    motionStatus.removeClass('no-motion').addClass('motion-detected');
+                } else {
+                    motionStatus.text("No Motion");
+                    motionStatus.removeClass('motion-detected').addClass('no-motion');
+                }
+
+                // Update body temperature with color coding
+                const bodyTemp = $('#body-temperature');
+                bodyTemp.text(data.body_temperature + ' °F');
+                if (data.body_temperature < 96) {
+                    bodyTemp.removeClass('temp-normal temp-high').addClass('temp-low');
+                } else if (data.body_temperature <= 100) {
+                    bodyTemp.removeClass('temp-low temp-high').addClass('temp-normal');
+                } else {
+                    bodyTemp.removeClass('temp-low temp-normal').addClass('temp-high');
+                }
+
+                // Update ambient temperature with color coding
+                const ambientTemp = $('#ambient-temperature');
+                ambientTemp.text(data.ambient_temperature + ' °C');
+                if (data.ambient_temperature < 25) {
+                    ambientTemp.removeClass('temp-high temp-low').addClass('temp-normal');
+                } else if (data.ambient_temperature <= 30) {
+                    ambientTemp.removeClass('temp-normal temp-high').addClass('temp-low');
+                } else {
+                    ambientTemp.removeClass('temp-low temp-normal').addClass('temp-high');
+                }
+            });
+        }
+
+        // Update the data every 2 seconds
+        $(document).ready(function() {
+            fetchData();
+            setInterval(fetchData, 1000);
+        });
+    </script>
+</head>
+<body>
+    <h1>Temperature and Motion Dashboard</h1>
+    
+    <div class="data-box">
+        <p>Motion Status: <span id="motion-status" class="no-motion">Loading...</span></p>
+    </div>
+    <div class="data-box">
+        <p>Body Temperature: <span id="body-temperature" class="temp-normal">Loading...</span></p>
+    </div>
+    <div class="data-box">
+        <p>Ambient Temperature: <span id="ambient-temperature" class="temp-normal">Loading...</span></p>
+    </div>
+
+    <h2>Camera Feed</h2>
+    <img id="camera-feed" src="{{ url_for('video_feed') }}" alt="Video Feed">
+
+    <div class="developer-info">
+        <p>Developed by: <span>Dr. Arkaprabha Sau</span></p>
+    </div>
+</body>
+</html>

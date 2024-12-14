@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Dashboard</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .status {
+            margin-top: 20px;
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sensor Dashboard</h1>
+    <div id="motionStatus" class="status">
+        Motion Detected: <span id="motionStatusText">{{ 'Yes' if motion_detected else 'No' }}</span>
+    </div>
+    <div id="temperatureStatus" class="status">
+        Body Temperature: <span id="bodyTemp">{{ body_temp_fahrenheit }}°F</span>
+        <br>
+        Ambient Temperature: <span id="ambientTemp">{{ ambient_temp_celsius }}°C</span>
+    </div>
+
+    <script>
+        function fetchData() {
+            $.getJSON('/data', function(data) {
+                // Update the motion status
+                if (data.motion_detected) {
+                    $('#motionStatusText').text('Yes');
+                    $('#motionStatus').css('color', 'green');
+                } else {
+                    $('#motionStatusText').text('No');
+                    $('#motionStatus').css('color', 'red');
+                }
+
+                // Update temperatures
+                $('#bodyTemp').text(data.body_temperature + '°F');
+                $('#ambientTemp').text(data.ambient_temperature + '°C');
+            });
+        }
+
+        // Fetch data every second
+        setInterval(fetchData, 1000);
+    </script>
+</body>
+</html>

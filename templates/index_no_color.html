@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperature and Motion Dashboard</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function fetchData() {
+            $.get('/data', function(data) {
+                // Update the page with the latest data
+                $('#motion-status').text(data.motion_detected ? "Motion Detected" : "No Motion");
+                $('#body-temperature').text(data.body_temperature + ' °F');
+                $('#ambient-temperature').text(data.ambient_temperature + ' °C');
+            });
+        }
+
+        // Update the data every 2 seconds
+        $(document).ready(function() {
+            fetchData();
+            setInterval(fetchData, 2000);
+        });
+    </script>
+</head>
+<body>
+    <h1>Temperature and Motion Dashboard</h1>
+    <div>
+        <p>Motion Status: <span id="motion-status">Loading...</span></p>
+        <p>Body Temperature: <span id="body-temperature">Loading...</span></p>
+        <p>Ambient Temperature: <span id="ambient-temperature">Loading...</span></p>
+    </div>
+    <h2>Camera Feed</h2>
+    <img src="{{ url_for('video_feed') }}" alt="Video Feed">
+</body>
+</html>
+
